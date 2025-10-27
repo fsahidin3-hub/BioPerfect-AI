@@ -1,4 +1,4 @@
-// File: pages/index.js (Kodeu Diropéa)
+// File: pages/index.js
 
 import Head from 'next/head';
 import { useState } from 'react'; 
@@ -7,7 +7,7 @@ export default function Home() {
   const [niche, setNiche] = useState('');
   const [audience, setAudience] = useState('');
   const [result, setResult] = useState('Your perfect bio will appear here...');
-  const [isLoading, setIsLoading] = useState(false); // Nambihan status loading
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -15,7 +15,7 @@ export default function Home() {
     setResult('Generating 3 optimized bios using AI...');
 
     try {
-      // Nelepon ka API Route anu nembé didamel
+      // Nelepon ka API Route generate.js
       const response = await fetch('/api/generate', {
         method: 'POST',
         headers: {
@@ -27,9 +27,9 @@ export default function Home() {
       const data = await response.json();
 
       if (data.error) {
-        setResult(`Error: ${data.error}`);
+        setResult(`Error: ${data.error}. Check your GEMINI_API_KEY on Vercel.`); // Nambihan cek error
       } else {
-        // Ganti gurat (new line) janten tag HTML <br/> pikeun tampilan
+        // Ganti hasil AI anu misah ku '--' janten garis
         const formattedResult = data.result.replace(/--/g, '<hr/>');
         setResult(formattedResult);
       }
@@ -103,7 +103,6 @@ export default function Home() {
         <div style={{ marginTop: '40px', padding: '20px', backgroundColor: '#e9f7ff', borderRadius: '8px', border: '2px solid #0070f3' }}>
           <h3 style={{ color: '#1a1a1a' }}>Generated Bio Results:</h3>
           <p style={{ minHeight: '50px', fontWeight: 'bold', color: '#0070f3', fontSize: '1.1em', textAlign: 'left' }}>
-            {/* Bahaya: Ieu dipaké pikeun némbongkeun tag HTML (hr) */}
             <span dangerouslySetInnerHTML={{ __html: result }} /> 
           </p>
         </div>

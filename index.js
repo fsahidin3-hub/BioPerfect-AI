@@ -1,23 +1,45 @@
-// File: pages/index.js
+// File: pages/index.js (Kodeu Diropéa)
 
 import Head from 'next/head';
 import { useState } from 'react'; 
-// Catetan: Urang can masangkeun AI (Gemini) di dieu. Ieu ngan tampilan heula.
 
 export default function Home() {
   const [niche, setNiche] = useState('');
   const [audience, setAudience] = useState('');
   const [result, setResult] = useState('Your perfect bio will appear here...');
+  const [isLoading, setIsLoading] = useState(false); // Nambihan status loading
 
-  // Fungsi anu bakal ngajalankeun AI engké
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setResult('Generating...');
-    
-    // IEU HANYA SIMULASI SEMENTARA. Engké diganti ku kodeu AI.
-    setTimeout(() => {
-      setResult(`AI Generated Bio (Preview): Creator | ${niche} Expert | Serving ${audience}. Tap the link to work with me!`);
-    }, 2000);
+    setIsLoading(true);
+    setResult('Generating 3 optimized bios using AI...');
+
+    try {
+      // Nelepon ka API Route anu nembé didamel
+      const response = await fetch('/api/generate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ niche, audience }),
+      });
+
+      const data = await response.json();
+
+      if (data.error) {
+        setResult(`Error: ${data.error}`);
+      } else {
+        // Ganti gurat (new line) janten tag HTML <br/> pikeun tampilan
+        const formattedResult = data.result.replace(/--/g, '<hr/>');
+        setResult(formattedResult);
+      }
+
+    } catch (error) {
+      console.error(error);
+      setResult('Failed to connect to the server or AI. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -27,7 +49,6 @@ export default function Home() {
         <meta name="description" content="AI tool to generate optimized Instagram bios for high conversion." />
       </Head>
 
-      {/* HEADER SECTION */}
       <header style={{ paddingBottom: '30px' }}>
         <h1 style={{ fontSize: '2.5em', color: '#1a1a1a' }}>
           **BioPerfect AI**
@@ -36,11 +57,10 @@ export default function Home() {
           Craft the Perfect Instagram Bio in Seconds.
         </h2>
         <p style={{ color: '#555', maxWidth: '600px', margin: '10px auto' }}>
-          Leverage AI to generate an optimized, high-converting 150-character bio that captures your niche and drives traffic. Stop guessing, start converting.
+          **Micro-SaaS:** Leverage AI to generate an optimized, high-converting 150-character bio that captures your niche and drives traffic.
         </p>
       </header>
 
-      {/* INPUT FORM SECTION */}
       <main style={{ maxWidth: '600px', margin: '0 auto', padding: '25px', backgroundColor: 'white', borderRadius: '12px', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
         <form onSubmit={handleSubmit}>
           
@@ -74,16 +94,17 @@ export default function Home() {
             />
           </div>
 
-          <button type="submit" style={buttonStyle}>
-            Generate Bio!
+          <button type="submit" style={buttonStyle} disabled={isLoading}>
+            {isLoading ? 'Generating... Please wait' : 'Generate 3 Bio Options!'}
           </button>
         </form>
 
         {/* RESULT SECTION */}
         <div style={{ marginTop: '40px', padding: '20px', backgroundColor: '#e9f7ff', borderRadius: '8px', border: '2px solid #0070f3' }}>
-          <h3 style={{ color: '#1a1a1a' }}>Generated Bio:</h3>
-          <p style={{ minHeight: '50px', fontWeight: 'bold', color: '#0070f3', fontSize: '1.1em' }}>
-            {result}
+          <h3 style={{ color: '#1a1a1a' }}>Generated Bio Results:</h3>
+          <p style={{ minHeight: '50px', fontWeight: 'bold', color: '#0070f3', fontSize: '1.1em', textAlign: 'left' }}>
+            {/* Bahaya: Ieu dipaké pikeun némbongkeun tag HTML (hr) */}
+            <span dangerouslySetInnerHTML={{ __html: result }} /> 
           </p>
         </div>
         <p style={{ marginTop: '10px', fontSize: '0.8em', color: '#888' }}>
@@ -91,7 +112,6 @@ export default function Home() {
         </p>
       </main>
 
-      {/* FOOTER */}
       <footer style={{ marginTop: '50px', fontSize: '0.8em', color: '#aaa' }}>
         <p>&copy; 2025 BioPerfect AI. Powered by AI and Vercel.</p>
       </footer>
@@ -99,7 +119,6 @@ export default function Home() {
   );
 }
 
-// Inline Styles (Pikeun tampilan anu saderhana)
 const inputStyle = {
   width: '100%',
   padding: '12px',

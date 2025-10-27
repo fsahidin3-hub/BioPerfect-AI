@@ -19,7 +19,6 @@ export default function HomePage() {
     setResult('Generating 3 optimized bios using AI...');
 
     try {
-      // Nelepon ka API Route anyar /api/generate
       const response = await fetch('/api/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
